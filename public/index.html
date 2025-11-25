@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Exercise Tracker</title>
+    <style>
+        :root {
+            font-family: system-ui, -apple-system, Segoe UI, Roboto, 'Helvetica Neue', Arial;
+        }
+
+        body {
+            max-width: 980px;
+            margin: 28px auto;
+            padding: 20px;
+            line-height: 1.45;
+            color: #111
+        }
+
+        h1 {
+            font-size: 1.4rem;
+            margin-bottom: 0.2rem
+        }
+
+        .card {
+            border: 1px solid #e6e6e6;
+            padding: 14px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            background: #fff;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03)
+        }
+
+        label {
+            display: block;
+            font-size: 0.85rem;
+            margin: 8px 0 6px
+        }
+
+        input[type=text],
+        input[type=number],
+        input[type=date],
+        select {
+            width: 100%;
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid #ddd
+        }
+
+        button {
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 0;
+            background: #0069ff;
+            color: #fff;
+            cursor: pointer
+        }
+
+        .muted {
+            color: #666;
+            font-size: 0.9rem
+        }
+
+        .row {
+            display: flex;
+            gap: 10px
+        }
+
+        .row>* {
+            flex: 1
+        }
+
+        pre {
+            background: #f7f7f7;
+            padding: 10px;
+            border-radius: 6px;
+            overflow: auto
+        }
+
+        ul {
+            padding-left: 18px
+        }
+
+        .small {
+            font-size: 0.85rem
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Exercise Tracker</h1>
+    <p class="muted">This small UI works with the Express API on the same origin. If you're running the server in
+        Gitpod, open the preview and this page will talk to your API endpoints.</p>
+
+    <section class="card">
+        <strong>Create new user</strong>
+        <label>Username</label>
+        <div class="row">
+            <input id="new-username" type="text" placeholder="e.g. john" />
+            <button id="create-user">Create</button>
+        </div>
+        <div id="create-user-result" class="small muted"></div>
+    </section>
+
+    <section class="card">
+        <strong>All users</strong>
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+            <button id="refresh-users">Refresh</button>
+            <span class="muted small">Click a user to select for adding exercises / viewing logs</span>
+        </div>
+        <div id="users-list">(no users yet)</div>
+    </section>
+
+    <section class="card">
+        <strong>Add exercise</strong>
+        <label>Selected user id <span id="selected-user" class="muted">(none)</span></label>
+        <label>Description</label>
+        <input id="ex-desc" type="text" placeholder="e.g. Running" />
+        <label>Duration (minutes)</label>
+        <input id="ex-duration" type="number" placeholder="30" />
+        <label>Date (optional)</label>
+        <input id="ex-date" type="date" />
+        <div style="margin-top:8px;display:flex;gap:8px">
+            <button id="add-ex">Add Exercise</button>
+            <div id="add-ex-result" class="muted small"></div>
+        </div>
+    </section>
+
+    <section class="card">
+        <strong>View log</strong>
+        <div class="row">
+            <input id="log-from" type="date" placeholder="from" />
+            <input id="log-to" type="date" placeholder="to" />
+            <input id="log-limit" type="number" placeholder="limit" />
+        </div>
+        <div style="margin-top:8px;display:flex;gap:8px">
+            <button id="get-log">Get Log</button>
+            <div id="get-log-result" class="muted small"></div>
+        </div>
+        <div id="log-output" style="margin-top:10px"></div>
+    </section>
+
+    <script>
+        // Helper: base url (same origin)
+        const base = '';
+
+        // Elements
+        const newUsername = document.getElementById('new-username');
+        const createUserBtn = document.getElementById('create-user');
+        const createUserResult = document.getElementById('create-user-result');
+
+        const refreshUsers = document.getElementById('refresh-users');
+        const usersList = document.getElementById('users-list');
+        const selectedUserEl = document.getElementById('selected-user');
+
+        const exDesc = document.getElementById('ex-desc');
+        const exDuration = document.getElementById('ex-duration');
+        const exDate = document.getElementById('ex-date');
+        const addExBtn = document.getElementById('add-ex');
+        const addExResult = document.getElementById('add-ex-result');
+
+        const logFrom = document.getElementById('log-from');
+        const logTo = document.getElementById('log-to');
+        const logLimit = document.getElementById('log-limit');
+        const getLogBtn = document.getElementById('get-log');
+        const logOutput = document.getElementById('log-output');
+        const getLogResult = document.getElementById('get-log-result');
+
+        let selectedUserId = null;
+
+        async function createUser() {
+            const name = newUsername.value.trim();
+            if (!name) { createUserResult.textContent = 'Enter a username'; return; }
+            createUserResult.textContent = 'Creating...';
+            try {
+                const res = await fetch(base + '/api/users', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams({ username: name }) });
+                const j = await res.json();
+                createUserResult.textContent = 'Created: ' + j.username + ' (' + j._id + ')';
+                newUsername.value = '';
+                await loadUsers();
+            } catch (e) { createUserResult.textContent = 'Error: ' + e.message }
+        }
+
+        async function loadUsers() {
+            usersList.textContent = 'Loading...';
+            try {
+                const res = await fetch(base + '/api/users');
+                const arr = await res.json();
+                if (!Array.isArray(arr) || arr.length === 0) { usersList.textContent = '(no users yet)'; return }
+                const ul = document.createElement('ul');
+                arr.forEach(u => {
+                    const li = document.createElement('li');
+                    li.style.cursor = 'pointer';
+                    li.textContent = u.username + ' — ' + u._id;
+                    li.title = 'Click to select this user';
+                    li.onclick = () => { selectUser(u); };
+                    ul.appendChild(li);
+                });
+                usersList.innerHTML = '';
+                usersList.appendChild(ul);
+            } catch (e) { usersList.textContent = 'Error: ' + e.message }
+        }
+
+        function selectUser(u) {
+            selectedUserId = u._id;
+            selectedUserEl.textContent = u.username + ' — ' + u._id;
+            addExResult.textContent = '';
+            getLogResult.textContent = '';
+            logOutput.innerHTML = '';
+        }
+
+        async function addExercise() {
+            if (!selectedUserId) { addExResult.textContent = 'Select a user first'; return }
+            const desc = exDesc.value.trim();
+            const dur = exDuration.value.trim();
+            const date = exDate.value;
+            if (!desc || !dur) { addExResult.textContent = 'Provide description and duration'; return }
+            addExResult.textContent = 'Adding...';
+            try {
+                const params = new URLSearchParams({ description: desc, duration: dur });
+                if (date) params.append('date', date);
+                const res = await fetch(base + '/api/users/' + selectedUserId + '/exercises', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: params });
+                const j = await res.json();
+                if (j.error) addExResult.textContent = 'Error: ' + j.error; else addExResult.textContent = 'Added: ' + j.description + ' on ' + j.date;
+                exDesc.value = ''; exDuration.value = ''; exDate.value = '';
+            } catch (e) { addExResult.textContent = 'Error: ' + e.message }
+        }
+
+        async function getLog() {
+            if (!selectedUserId) { getLogResult.textContent = 'Select a user first'; return }
+            getLogResult.textContent = 'Loading...';
+            logOutput.innerHTML = '';
+            try {
+                const q = new URLSearchParams();
+                if (logFrom.value) q.append('from', logFrom.value);
+                if (logTo.value) q.append('to', logTo.value);
+                if (logLimit.value) q.append('limit', logLimit.value);
+                const url = base + '/api/users/' + selectedUserId + '/logs' + (q.toString() ? ('?' + q.toString()) : '');
+                const res = await fetch(url);
+                const j = await res.json();
+                if (j.error) { getLogResult.textContent = 'Error: ' + j.error; return }
+                getLogResult.textContent = '';
+                const out = document.createElement('div');
+                out.innerHTML = '<strong>' + j.username + '</strong> — count: ' + j.count + '<br>';
+                if (Array.isArray(j.log) && j.log.length) {
+                    const pre = document.createElement('pre');
+                    pre.textContent = j.log.map(l => l.date + ' — ' + l.description + ' (' + l.duration + ' min)').join('\n');
+                    out.appendChild(pre);
+                } else {
+                    out.appendChild(Object.assign(document.createElement('div'), { textContent: 'No log entries' }));
+                }
+                logOutput.appendChild(out);
+            } catch (e) { getLogResult.textContent = 'Error: ' + e.message }
+        }
+
+        // Events
+        createUserBtn.addEventListener('click', createUser);
+        refreshUsers.addEventListener('click', loadUsers);
+        addExBtn.addEventListener('click', addExercise);
+        getLogBtn.addEventListener('click', getLog);
+
+        // Initial load
+        loadUsers();
+    </script>
+</body>
+
+</html>
