@@ -6,7 +6,6 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-const path = require("path");
 require("dotenv").config();
 
 const app = express();
@@ -22,16 +21,19 @@ app.use(express.static("public"));
 // ============================================
 // MONGODB CONNECTION
 // ============================================
+const mongoUri =
+  process.env.MONGO_URI || "mongodb://localhost:27017/exercise-tracker";
+
 mongoose
-  .connect(
-    process.env.MONGO_URI || "mongodb://localhost:27017/exercise-tracker",
-    {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    }
-  )
+  .connect(mongoUri, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
   .then(() => console.log("✅ MongoDB connected successfully"))
-  .catch((err) => console.error("❌ MongoDB connection error:", err));
+  .catch((err) => {
+    console.error("❌ MongoDB connection error:", err);
+    process.exit(1);
+  });
 
 // ============================================
 // MONGOOSE SCHEMAS AND MODELS
@@ -42,7 +44,6 @@ const userSchema = new mongoose.Schema({
   username: {
     type: String,
     required: true,
-    unique: true,
   },
 });
 
@@ -77,7 +78,7 @@ const Exercise = mongoose.model("Exercise", exerciseSchema);
 
 // Root route - serves the HTML interface
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
+  res.sendFile(__dirname + "/views/index.html");
 });
 
 // --------------------------------------------
@@ -102,13 +103,9 @@ app.post("/api/users", async (req, res) => {
     // Return exact format required by FCC tests
     res.json({
       username: savedUser.username,
-      _id: savedUser._id.toString(),
+      _id: savedUser._id,
     });
   } catch (err) {
-    // Handle duplicate username error
-    if (err.code === 11000) {
-      return res.json({ error: "Username already exists" });
-    }
     console.error("Error creating user:", err);
     res.status(500).json({ error: "Error creating user" });
   }
@@ -124,12 +121,7 @@ app.get("/api/users", async (req, res) => {
     const users = await User.find({}).select("username _id");
 
     // Return array of users with exact format
-    res.json(
-      users.map((user) => ({
-        username: user.username,
-        _id: user._id.toString(),
-      }))
-    );
+    res.json(users);
   } catch (err) {
     console.error("Error fetching users:", err);
     res.status(500).json({ error: "Error fetching users" });
@@ -174,11 +166,11 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
 
     // Return exact format required by FCC tests
     res.json({
+      _id: user._id,
       username: user.username,
-      description: newExercise.description,
-      duration: newExercise.duration,
       date: newExercise.date.toDateString(),
-      _id: user._id.toString(),
+      duration: newExercise.duration,
+      description: newExercise.description,
     });
   } catch (err) {
     console.error("Error adding exercise:", err);
@@ -237,9 +229,9 @@ app.get("/api/users/:_id/logs", async (req, res) => {
 
     // Return exact format required by FCC tests
     res.json({
+      _id: user._id,
       username: user.username,
       count: exercises.length,
-      _id: user._id.toString(),
       log: log,
     });
   } catch (err) {
@@ -253,5 +245,4 @@ app.get("/api/users/:_id/logs", async (req, res) => {
 // ============================================
 const listener = app.listen(process.env.PORT || 3000, () => {
   console.log("🚀 Your app is listening on port " + listener.address().port);
-  console.log("📝 Visit http://localhost:" + listener.address().port);
 });

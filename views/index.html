@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -58,7 +59,8 @@
       font-size: 1.4rem;
     }
 
-    .form-section, .info-section {
+    .form-section,
+    .info-section {
       margin-bottom: 35px;
       padding: 25px;
       background: #f8f9fa;
@@ -197,7 +199,7 @@
       .container {
         padding: 25px;
       }
-      
+
       h1 {
         font-size: 2.2rem;
       }
@@ -212,24 +214,18 @@
     }
   </style>
 </head>
+
 <body>
   <div class="container">
     <h1>💪 Exercise Tracker</h1>
     <p class="subtitle">Track your fitness journey with our simple API</p>
-    
+
     <!-- Create New User -->
     <div class="form-section">
       <h2><span class="icon">👤</span> Create a New User</h2>
       <form action="/api/users" method="post">
         <label for="username">Username:</label>
-        <input 
-          type="text" 
-          name="username" 
-          id="username" 
-          placeholder="Enter username (e.g., fcc_test)" 
-          required
-          maxlength="50"
-        >
+        <input type="text" name="username" id="username" placeholder="Enter username (e.g., fcc_test)" required>
         <button type="submit">Create User</button>
       </form>
       <div class="note success">
@@ -242,42 +238,17 @@
       <h2><span class="icon">🏃</span> Add Exercise</h2>
       <form id="exercise-form" method="post">
         <label for="userId">User ID:</label>
-        <input 
-          type="text" 
-          name="userId" 
-          id="userId" 
-          placeholder="Paste user _id here (e.g., 5fb5853f734231456ccb3b05)" 
-          required
-        >
-        
+        <input type="text" name="userId" id="userId" placeholder="Paste user _id here" required>
+
         <label for="description">Description:</label>
-        <input 
-          type="text" 
-          name="description" 
-          id="description" 
-          placeholder="e.g., Running, Swimming, Cycling" 
-          required
-          maxlength="100"
-        >
-        
+        <input type="text" name="description" id="description" placeholder="e.g., Running, Swimming, Cycling" required>
+
         <label for="duration">Duration (minutes):</label>
-        <input 
-          type="number" 
-          name="duration" 
-          id="duration" 
-          placeholder="e.g., 30" 
-          required
-          min="1"
-          max="1440"
-        >
-        
+        <input type="number" name="duration" id="duration" placeholder="e.g., 30" required min="1">
+
         <label for="date">Date (optional):</label>
-        <input 
-          type="date" 
-          name="date" 
-          id="date"
-        >
-        
+        <input type="date" name="date" id="date">
+
         <button type="submit">Add Exercise</button>
       </form>
       <div class="note">
@@ -290,43 +261,23 @@
       <h2><span class="icon">📊</span> Get Exercise Logs</h2>
       <form id="log-form">
         <label for="logUserId">User ID:</label>
-        <input 
-          type="text" 
-          name="logUserId" 
-          id="logUserId" 
-          placeholder="Paste user _id here" 
-          required
-        >
-        
+        <input type="text" name="logUserId" id="logUserId" placeholder="Paste user _id here" required>
+
         <div class="grid">
           <div>
             <label for="from">From (optional):</label>
-            <input 
-              type="date" 
-              name="from" 
-              id="from"
-            >
+            <input type="date" name="from" id="from">
           </div>
-          
+
           <div>
             <label for="to">To (optional):</label>
-            <input 
-              type="date" 
-              name="to" 
-              id="to"
-            >
+            <input type="date" name="to" id="to">
           </div>
         </div>
-        
+
         <label for="limit">Limit (optional):</label>
-        <input 
-          type="number" 
-          name="limit" 
-          id="limit" 
-          placeholder="e.g., 10 (max number of exercises to return)"
-          min="1"
-        >
-        
+        <input type="number" name="limit" id="limit" placeholder="e.g., 10 (max number of exercises to return)" min="1">
+
         <button type="submit">Get Logs</button>
       </form>
       <div class="note">
@@ -362,58 +313,54 @@
     </div>
 
     <footer>
-      <p>Built for <a href="https://www.freecodecamp.org/" target="_blank">FreeCodeCamp</a> Back End Development Certification</p>
+      <p>Built for <a href="https://www.freecodecamp.org/" target="_blank">FreeCodeCamp</a> Back End Development
+        Certification</p>
       <p style="margin-top: 10px;">Made with ❤️ using Node.js, Express, and MongoDB</p>
     </footer>
   </div>
 
   <script>
     // Handle exercise form submission
-    document.getElementById('exercise-form').addEventListener('submit', function(e) {
+    document.getElementById('exercise-form').addEventListener('submit', function (e) {
       e.preventDefault();
       const userId = document.getElementById('userId').value.trim();
-      
+
       if (!userId) {
         alert('Please enter a User ID');
         return;
       }
-      
+
       const form = e.target;
       form.action = `/api/users/${userId}/exercises`;
       form.submit();
     });
 
     // Handle log form submission
-    document.getElementById('log-form').addEventListener('submit', function(e) {
+    document.getElementById('log-form').addEventListener('submit', function (e) {
       e.preventDefault();
       const userId = document.getElementById('logUserId').value.trim();
-      
+
       if (!userId) {
         alert('Please enter a User ID');
         return;
       }
-      
+
       const from = document.getElementById('from').value;
       const to = document.getElementById('to').value;
       const limit = document.getElementById('limit').value;
-      
+
       let url = `/api/users/${userId}/logs?`;
       const params = [];
-      
+
       if (from) params.push(`from=${from}`);
       if (to) params.push(`to=${to}`);
       if (limit) params.push(`limit=${limit}`);
-      
+
       url += params.join('&');
-      
+
       window.location.href = url;
     });
-
-    // Auto-fill today's date as max for date inputs
-    const today = new Date().toISOString().split('T')[0];
-    document.getElementById('date').setAttribute('max', today);
-    document.getElementById('from').setAttribute('max', today);
-    document.getElementById('to').setAttribute('max', today);
   </script>
 </body>
+
 </html>
