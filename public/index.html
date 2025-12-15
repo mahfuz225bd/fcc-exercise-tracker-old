@@ -1,268 +1,419 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Exercise Tracker</title>
-    <style>
-        :root {
-            font-family: system-ui, -apple-system, Segoe UI, Roboto, 'Helvetica Neue', Arial;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Exercise Tracker | FreeCodeCamp Project</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-        body {
-            max-width: 980px;
-            margin: 28px auto;
-            padding: 20px;
-            line-height: 1.45;
-            color: #111
-        }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+      color: #333;
+    }
 
-        h1 {
-            font-size: 1.4rem;
-            margin-bottom: 0.2rem
-        }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 12px;
+      padding: 40px;
+      box-shadow: 0 10px 50px rgba(0, 0, 0, 0.3);
+    }
 
-        .card {
-            border: 1px solid #e6e6e6;
-            padding: 14px;
-            border-radius: 8px;
-            margin-bottom: 12px;
-            background: #fff;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03)
-        }
+    h1 {
+      text-align: center;
+      color: #667eea;
+      margin-bottom: 10px;
+      font-size: 2.8rem;
+      font-weight: 700;
+    }
 
-        label {
-            display: block;
-            font-size: 0.85rem;
-            margin: 8px 0 6px
-        }
+    .subtitle {
+      text-align: center;
+      color: #666;
+      margin-bottom: 40px;
+      font-size: 1.1rem;
+    }
 
-        input[type=text],
-        input[type=number],
-        input[type=date],
-        select {
-            width: 100%;
-            padding: 8px;
-            border-radius: 6px;
-            border: 1px solid #ddd
-        }
+    h2 {
+      color: #764ba2;
+      margin-bottom: 20px;
+      font-size: 1.6rem;
+      border-bottom: 3px solid #667eea;
+      padding-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
 
-        button {
-            padding: 8px 12px;
-            border-radius: 6px;
-            border: 0;
-            background: #0069ff;
-            color: #fff;
-            cursor: pointer
-        }
+    .icon {
+      font-size: 1.4rem;
+    }
 
-        .muted {
-            color: #666;
-            font-size: 0.9rem
-        }
+    .form-section, .info-section {
+      margin-bottom: 35px;
+      padding: 25px;
+      background: #f8f9fa;
+      border-radius: 10px;
+      border: 1px solid #e9ecef;
+    }
 
-        .row {
-            display: flex;
-            gap: 10px
-        }
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
 
-        .row>* {
-            flex: 1
-        }
+    label {
+      font-weight: 600;
+      color: #495057;
+      margin-bottom: 5px;
+      font-size: 0.95rem;
+    }
 
-        pre {
-            background: #f7f7f7;
-            padding: 10px;
-            border-radius: 6px;
-            overflow: auto
-        }
+    input {
+      padding: 14px;
+      border: 2px solid #dee2e6;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: all 0.3s;
+      font-family: inherit;
+    }
 
-        ul {
-            padding-left: 18px
-        }
+    input:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
 
-        .small {
-            font-size: 0.85rem
-        }
-    </style>
+    input::placeholder {
+      color: #adb5bd;
+    }
+
+    button {
+      padding: 14px 28px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.05rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    .info-section ul {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    .info-section li {
+      padding: 15px;
+      margin-bottom: 10px;
+      background: white;
+      border-left: 5px solid #667eea;
+      border-radius: 6px;
+      transition: all 0.3s;
+    }
+
+    .info-section li:hover {
+      transform: translateX(5px);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .info-section strong {
+      color: #764ba2;
+      font-weight: 700;
+    }
+
+    .info-section code {
+      background: #f1f3f5;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.9rem;
+      color: #495057;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+    }
+
+    .note {
+      background: #fff3cd;
+      border-left: 4px solid #ffc107;
+      padding: 12px 16px;
+      border-radius: 6px;
+      margin-top: 15px;
+      color: #856404;
+      font-size: 0.9rem;
+    }
+
+    .success {
+      background: #d4edda;
+      border-left: 4px solid #28a745;
+      color: #155724;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 2px solid #e9ecef;
+      color: #6c757d;
+    }
+
+    footer a {
+      color: #667eea;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 25px;
+      }
+      
+      h1 {
+        font-size: 2.2rem;
+      }
+
+      h2 {
+        font-size: 1.3rem;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
-
 <body>
-    <h1>Exercise Tracker</h1>
-    <p class="muted">This small UI works with the Express API on the same origin. If you're running the server in
-        Gitpod, open the preview and this page will talk to your API endpoints.</p>
+  <div class="container">
+    <h1>💪 Exercise Tracker</h1>
+    <p class="subtitle">Track your fitness journey with our simple API</p>
+    
+    <!-- Create New User -->
+    <div class="form-section">
+      <h2><span class="icon">👤</span> Create a New User</h2>
+      <form action="/api/users" method="post">
+        <label for="username">Username:</label>
+        <input 
+          type="text" 
+          name="username" 
+          id="username" 
+          placeholder="Enter username (e.g., fcc_test)" 
+          required
+          maxlength="50"
+        >
+        <button type="submit">Create User</button>
+      </form>
+      <div class="note success">
+        After creating a user, copy the <code>_id</code> from the response to use in other forms.
+      </div>
+    </div>
 
-    <section class="card">
-        <strong>Create new user</strong>
-        <label>Username</label>
-        <div class="row">
-            <input id="new-username" type="text" placeholder="e.g. john" />
-            <button id="create-user">Create</button>
+    <!-- Add Exercise -->
+    <div class="form-section">
+      <h2><span class="icon">🏃</span> Add Exercise</h2>
+      <form id="exercise-form" method="post">
+        <label for="userId">User ID:</label>
+        <input 
+          type="text" 
+          name="userId" 
+          id="userId" 
+          placeholder="Paste user _id here (e.g., 5fb5853f734231456ccb3b05)" 
+          required
+        >
+        
+        <label for="description">Description:</label>
+        <input 
+          type="text" 
+          name="description" 
+          id="description" 
+          placeholder="e.g., Running, Swimming, Cycling" 
+          required
+          maxlength="100"
+        >
+        
+        <label for="duration">Duration (minutes):</label>
+        <input 
+          type="number" 
+          name="duration" 
+          id="duration" 
+          placeholder="e.g., 30" 
+          required
+          min="1"
+          max="1440"
+        >
+        
+        <label for="date">Date (optional):</label>
+        <input 
+          type="date" 
+          name="date" 
+          id="date"
+        >
+        
+        <button type="submit">Add Exercise</button>
+      </form>
+      <div class="note">
+        💡 If you don't specify a date, today's date will be used automatically.
+      </div>
+    </div>
+
+    <!-- Get User Logs -->
+    <div class="form-section">
+      <h2><span class="icon">📊</span> Get Exercise Logs</h2>
+      <form id="log-form">
+        <label for="logUserId">User ID:</label>
+        <input 
+          type="text" 
+          name="logUserId" 
+          id="logUserId" 
+          placeholder="Paste user _id here" 
+          required
+        >
+        
+        <div class="grid">
+          <div>
+            <label for="from">From (optional):</label>
+            <input 
+              type="date" 
+              name="from" 
+              id="from"
+            >
+          </div>
+          
+          <div>
+            <label for="to">To (optional):</label>
+            <input 
+              type="date" 
+              name="to" 
+              id="to"
+            >
+          </div>
         </div>
-        <div id="create-user-result" class="small muted"></div>
-    </section>
+        
+        <label for="limit">Limit (optional):</label>
+        <input 
+          type="number" 
+          name="limit" 
+          id="limit" 
+          placeholder="e.g., 10 (max number of exercises to return)"
+          min="1"
+        >
+        
+        <button type="submit">Get Logs</button>
+      </form>
+      <div class="note">
+        🔍 Use filters to view exercises within a specific date range or limit results.
+      </div>
+    </div>
 
-    <section class="card">
-        <strong>All users</strong>
-        <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
-            <button id="refresh-users">Refresh</button>
-            <span class="muted small">Click a user to select for adding exercises / viewing logs</span>
-        </div>
-        <div id="users-list">(no users yet)</div>
-    </section>
+    <!-- API Endpoints -->
+    <div class="info-section">
+      <h2><span class="icon">🔌</span> API Endpoints</h2>
+      <ul>
+        <li>
+          <strong>POST /api/users</strong><br>
+          Create a new user<br>
+          <code>Body: { username: "string" }</code>
+        </li>
+        <li>
+          <strong>GET /api/users</strong><br>
+          Get all users<br>
+          <code>Returns: Array of users</code>
+        </li>
+        <li>
+          <strong>POST /api/users/:_id/exercises</strong><br>
+          Add exercise for a user<br>
+          <code>Body: { description: "string", duration: number, date: "yyyy-mm-dd" }</code>
+        </li>
+        <li>
+          <strong>GET /api/users/:_id/logs?[from][&to][&limit]</strong><br>
+          Get user's exercise log with optional filters<br>
+          <code>Query: from, to (yyyy-mm-dd), limit (number)</code>
+        </li>
+      </ul>
+    </div>
 
-    <section class="card">
-        <strong>Add exercise</strong>
-        <label>Selected user id <span id="selected-user" class="muted">(none)</span></label>
-        <label>Description</label>
-        <input id="ex-desc" type="text" placeholder="e.g. Running" />
-        <label>Duration (minutes)</label>
-        <input id="ex-duration" type="number" placeholder="30" />
-        <label>Date (optional)</label>
-        <input id="ex-date" type="date" />
-        <div style="margin-top:8px;display:flex;gap:8px">
-            <button id="add-ex">Add Exercise</button>
-            <div id="add-ex-result" class="muted small"></div>
-        </div>
-    </section>
+    <footer>
+      <p>Built for <a href="https://www.freecodecamp.org/" target="_blank">FreeCodeCamp</a> Back End Development Certification</p>
+      <p style="margin-top: 10px;">Made with ❤️ using Node.js, Express, and MongoDB</p>
+    </footer>
+  </div>
 
-    <section class="card">
-        <strong>View log</strong>
-        <div class="row">
-            <input id="log-from" type="date" placeholder="from" />
-            <input id="log-to" type="date" placeholder="to" />
-            <input id="log-limit" type="number" placeholder="limit" />
-        </div>
-        <div style="margin-top:8px;display:flex;gap:8px">
-            <button id="get-log">Get Log</button>
-            <div id="get-log-result" class="muted small"></div>
-        </div>
-        <div id="log-output" style="margin-top:10px"></div>
-    </section>
+  <script>
+    // Handle exercise form submission
+    document.getElementById('exercise-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const userId = document.getElementById('userId').value.trim();
+      
+      if (!userId) {
+        alert('Please enter a User ID');
+        return;
+      }
+      
+      const form = e.target;
+      form.action = `/api/users/${userId}/exercises`;
+      form.submit();
+    });
 
-    <script>
-        // Helper: base url (same origin)
-        const base = '';
+    // Handle log form submission
+    document.getElementById('log-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const userId = document.getElementById('logUserId').value.trim();
+      
+      if (!userId) {
+        alert('Please enter a User ID');
+        return;
+      }
+      
+      const from = document.getElementById('from').value;
+      const to = document.getElementById('to').value;
+      const limit = document.getElementById('limit').value;
+      
+      let url = `/api/users/${userId}/logs?`;
+      const params = [];
+      
+      if (from) params.push(`from=${from}`);
+      if (to) params.push(`to=${to}`);
+      if (limit) params.push(`limit=${limit}`);
+      
+      url += params.join('&');
+      
+      window.location.href = url;
+    });
 
-        // Elements
-        const newUsername = document.getElementById('new-username');
-        const createUserBtn = document.getElementById('create-user');
-        const createUserResult = document.getElementById('create-user-result');
-
-        const refreshUsers = document.getElementById('refresh-users');
-        const usersList = document.getElementById('users-list');
-        const selectedUserEl = document.getElementById('selected-user');
-
-        const exDesc = document.getElementById('ex-desc');
-        const exDuration = document.getElementById('ex-duration');
-        const exDate = document.getElementById('ex-date');
-        const addExBtn = document.getElementById('add-ex');
-        const addExResult = document.getElementById('add-ex-result');
-
-        const logFrom = document.getElementById('log-from');
-        const logTo = document.getElementById('log-to');
-        const logLimit = document.getElementById('log-limit');
-        const getLogBtn = document.getElementById('get-log');
-        const logOutput = document.getElementById('log-output');
-        const getLogResult = document.getElementById('get-log-result');
-
-        let selectedUserId = null;
-
-        async function createUser() {
-            const name = newUsername.value.trim();
-            if (!name) { createUserResult.textContent = 'Enter a username'; return; }
-            createUserResult.textContent = 'Creating...';
-            try {
-                const res = await fetch(base + '/api/users', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams({ username: name }) });
-                const j = await res.json();
-                createUserResult.textContent = 'Created: ' + j.username + ' (' + j._id + ')';
-                newUsername.value = '';
-                await loadUsers();
-            } catch (e) { createUserResult.textContent = 'Error: ' + e.message }
-        }
-
-        async function loadUsers() {
-            usersList.textContent = 'Loading...';
-            try {
-                const res = await fetch(base + '/api/users');
-                const arr = await res.json();
-                if (!Array.isArray(arr) || arr.length === 0) { usersList.textContent = '(no users yet)'; return }
-                const ul = document.createElement('ul');
-                arr.forEach(u => {
-                    const li = document.createElement('li');
-                    li.style.cursor = 'pointer';
-                    li.textContent = u.username + ' — ' + u._id;
-                    li.title = 'Click to select this user';
-                    li.onclick = () => { selectUser(u); };
-                    ul.appendChild(li);
-                });
-                usersList.innerHTML = '';
-                usersList.appendChild(ul);
-            } catch (e) { usersList.textContent = 'Error: ' + e.message }
-        }
-
-        function selectUser(u) {
-            selectedUserId = u._id;
-            selectedUserEl.textContent = u.username + ' — ' + u._id;
-            addExResult.textContent = '';
-            getLogResult.textContent = '';
-            logOutput.innerHTML = '';
-        }
-
-        async function addExercise() {
-            if (!selectedUserId) { addExResult.textContent = 'Select a user first'; return }
-            const desc = exDesc.value.trim();
-            const dur = exDuration.value.trim();
-            const date = exDate.value;
-            if (!desc || !dur) { addExResult.textContent = 'Provide description and duration'; return }
-            addExResult.textContent = 'Adding...';
-            try {
-                const params = new URLSearchParams({ description: desc, duration: dur });
-                if (date) params.append('date', date);
-                const res = await fetch(base + '/api/users/' + selectedUserId + '/exercises', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: params });
-                const j = await res.json();
-                if (j.error) addExResult.textContent = 'Error: ' + j.error; else addExResult.textContent = 'Added: ' + j.description + ' on ' + j.date;
-                exDesc.value = ''; exDuration.value = ''; exDate.value = '';
-            } catch (e) { addExResult.textContent = 'Error: ' + e.message }
-        }
-
-        async function getLog() {
-            if (!selectedUserId) { getLogResult.textContent = 'Select a user first'; return }
-            getLogResult.textContent = 'Loading...';
-            logOutput.innerHTML = '';
-            try {
-                const q = new URLSearchParams();
-                if (logFrom.value) q.append('from', logFrom.value);
-                if (logTo.value) q.append('to', logTo.value);
-                if (logLimit.value) q.append('limit', logLimit.value);
-                const url = base + '/api/users/' + selectedUserId + '/logs' + (q.toString() ? ('?' + q.toString()) : '');
-                const res = await fetch(url);
-                const j = await res.json();
-                if (j.error) { getLogResult.textContent = 'Error: ' + j.error; return }
-                getLogResult.textContent = '';
-                const out = document.createElement('div');
-                out.innerHTML = '<strong>' + j.username + '</strong> — count: ' + j.count + '<br>';
-                if (Array.isArray(j.log) && j.log.length) {
-                    const pre = document.createElement('pre');
-                    pre.textContent = j.log.map(l => l.date + ' — ' + l.description + ' (' + l.duration + ' min)').join('\n');
-                    out.appendChild(pre);
-                } else {
-                    out.appendChild(Object.assign(document.createElement('div'), { textContent: 'No log entries' }));
-                }
-                logOutput.appendChild(out);
-            } catch (e) { getLogResult.textContent = 'Error: ' + e.message }
-        }
-
-        // Events
-        createUserBtn.addEventListener('click', createUser);
-        refreshUsers.addEventListener('click', loadUsers);
-        addExBtn.addEventListener('click', addExercise);
-        getLogBtn.addEventListener('click', getLog);
-
-        // Initial load
-        loadUsers();
-    </script>
+    // Auto-fill today's date as max for date inputs
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('date').setAttribute('max', today);
+    document.getElementById('from').setAttribute('max', today);
+    document.getElementById('to').setAttribute('max', today);
+  </script>
 </body>
-
 </html>
